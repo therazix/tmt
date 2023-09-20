@@ -1,0 +1,4 @@
+summary: Enabled plan
+execute:
+    script: echo "enabled";/bin/true
+enabled: true

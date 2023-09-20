@@ -1,0 +1,4 @@
+summary: Disabled plan
+execute:
+    script: echo "disabled";/bin/true
+enabled: false
