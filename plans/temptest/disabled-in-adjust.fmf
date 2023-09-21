@@ -1,0 +1,7 @@
+summary: Disabled by adjust
+execute:
+    script: echo "disabled by adjust";/bin/true
+enabled: true
+adjust+:
+  - enabled: false
+    when: foo == bar
