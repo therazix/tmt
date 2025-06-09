@@ -1870,6 +1870,8 @@ def expand_node_data(data: T, fmf_context: FmfContext) -> T:
 class _RemotePlanReference(_RawFmfId):
     importing: Optional[str]
     scope: Optional[str]
+    inherit_context: Optional[bool]
+    inherit_environment: Optional[bool]
 
 
 class RemotePlanReferenceImporting(enum.Enum):
@@ -1903,10 +1905,18 @@ class RemotePlanReference(
     # Repeat the SpecBasedContainer, with more fitting in/out spec type.
     SpecBasedContainer[_RemotePlanReference, _RemotePlanReference],
 ):
-    VALID_KEYS: ClassVar[list[str]] = [*FmfId.VALID_KEYS, 'importing', 'scope']
+    VALID_KEYS: ClassVar[list[str]] = [
+        *FmfId.VALID_KEYS,
+        'importing',
+        'scope',
+        'inherit-context',
+        'inherit-environment',
+    ]
 
     importing: RemotePlanReferenceImporting = RemotePlanReferenceImporting.REPLACE
     scope: RemotePlanReferenceImportScope = RemotePlanReferenceImportScope.FIRST_PLAN_ONLY
+    inherit_context: bool = False
+    inherit_environment: bool = False
 
     @functools.cached_property
     def name_pattern(self) -> Pattern[str]:
@@ -1989,6 +1999,8 @@ class RemotePlanReference(
         reference.scope = RemotePlanReferenceImportScope.from_spec(
             str(raw.get('scope', RemotePlanReferenceImportScope.FIRST_PLAN_ONLY.value))
         )
+        reference.inherit_context = bool(raw.get('inherit-context', False))
+        reference.inherit_environment = bool(raw.get('inherit-environment', False))
 
         return reference
 
@@ -2169,9 +2181,10 @@ class Plan(
         )
 
         # If this is an imported plan, update it with local environment stored in the original plan
-        environment_from_original_plan = (
-            self._original_plan.environment if self._original_plan else Environment()
-        )
+        # environment_from_original_plan = (
+        #     self._original_plan.environment if self._original_plan else Environment()
+        # )
+        environment_from_original_plan = Environment()
 
         if self.my_run:
             combined = self._plan_environment.copy()
@@ -3034,9 +3047,22 @@ class Plan(
 
             self.debug(f"Turning node '{node.name}' into a plan.", level=3)
 
+            fmf_context = self._fmf_context
+
+            # If requested, let imported plan inherit the context of the current plan
+            if reference.inherit_context:
+                fmf_context = FmfContext(node.data.get('context', {}))
+                fmf_context.update(self._fmf_context)
+                node.data['context'] = fmf_context.to_spec()
+
+            if reference.inherit_environment:
+                environment = node.data.get('environment', {})
+                environment.update(self.environment.to_fmf_spec())
+                node.data['environment'] = environment
+
             # Adjust the imported tree, to let any `adjust` rules defined in it take
             # action.
-            node.adjust(fmf.context.Context(**self._fmf_context), case_sensitive=False)
+            node.adjust(fmf.context.Context(**fmf_context), case_sensitive=False)
 
             # If the local plan is disabled, disable the imported plan as well
             if not self.enabled:
