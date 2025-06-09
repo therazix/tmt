@@ -1870,6 +1870,8 @@ def expand_node_data(data: T, fmf_context: FmfContext) -> T:
 class _RemotePlanReference(_RawFmfId):
     importing: Optional[str]
     scope: Optional[str]
+    inherit_context: Optional[bool]
+    inherit_environment: Optional[bool]
 
 
 class RemotePlanReferenceImporting(enum.Enum):
@@ -1903,10 +1905,18 @@ class RemotePlanReference(
     # Repeat the SpecBasedContainer, with more fitting in/out spec type.
     SpecBasedContainer[_RemotePlanReference, _RemotePlanReference],
 ):
-    VALID_KEYS: ClassVar[list[str]] = [*FmfId.VALID_KEYS, 'importing', 'scope']
+    VALID_KEYS: ClassVar[list[str]] = [
+        *FmfId.VALID_KEYS,
+        'importing',
+        'scope',
+        'inherit-context',
+        'inherit-environment',
+    ]
 
     importing: RemotePlanReferenceImporting = RemotePlanReferenceImporting.REPLACE
     scope: RemotePlanReferenceImportScope = RemotePlanReferenceImportScope.FIRST_PLAN_ONLY
+    inherit_context: bool = False
+    inherit_environment: bool = False
 
     @functools.cached_property
     def name_pattern(self) -> Pattern[str]:
@@ -1989,6 +1999,8 @@ class RemotePlanReference(
         reference.scope = RemotePlanReferenceImportScope.from_spec(
             str(raw.get('scope', RemotePlanReferenceImportScope.FIRST_PLAN_ONLY.value))
         )
+        reference.inherit_context = bool(raw.get('inherit_context', False))
+        reference.inherit_environment = bool(raw.get('inherit_environment', False))
 
         return reference
 
