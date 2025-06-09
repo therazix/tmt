@@ -12,6 +12,12 @@ The :ref:`organize-data` chapter of the Guide has been extended
 with the :ref:`share-tests` section describing how to efficiently
 maintain test code and share it across repositories.
 
+While :ref:`importing a remote plan</spec/plans/import>`, users can now
+configure if the context and environment variables from the importing
+plan should be propagated to the imported plan. This behavior can be
+controlled by the new ``inherit-context`` and ``inherit-environment``
+options. These options are enabled by default.
+
 
 tmt-1.50.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
