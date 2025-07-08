@@ -46,9 +46,19 @@ rlJournalStart
         assert_check_result "Test results have failed permission check" "/internal/permission" "internal/permission" "fail"
     rlPhaseEnd
 
-    rlPhaseStartTest "Test invocation check with $PROVISION_HOW"
-        rlRun "$tmt_command /internal/invocation" 2
-        assert_check_result "Test results have failed invocation check" "/internal/invocation" "internal/invocation" "fail"
+    rlPhaseStartTest "Test invocation pidfile check with $PROVISION_HOW"
+        rlRun "$tmt_command /internal/invocation/pidfile" 2
+        assert_check_result "Test results have failed invocation pidfile check" "/internal/invocation/pidfile" "internal/invocation" "fail"
+    rlPhaseEnd
+
+    rlPhaseStartTest "Test invocation restart check with $PROVISION_HOW"
+        rlRun "$tmt_command /internal/invocation/restart" 2
+        assert_check_result "Test results have failed invocation restart check" "/internal/invocation/restart" "internal/invocation" "fail"
+    rlPhaseEnd
+
+    rlPhaseStartTest "Test guest reconnect check with $PROVISION_HOW"
+        rlRun "$tmt_command /internal/guest/reconnect" 2
+        assert_check_result "Test results have failed guest reconnect check" "/internal/guest/reconnect" "internal/guest" "fail"
     rlPhaseEnd
 
     rlPhaseStartCleanup

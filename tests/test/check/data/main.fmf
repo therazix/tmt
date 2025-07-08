@@ -140,4 +140,14 @@
     /permission:
         test: /dev/null
     /invocation:
-        test: exit 122
+        /pidfile:
+            test: exit 122
+        /restart:
+            summary: Test should fail due to exceeded restart count
+            test: "echo RESTART_COUNT=$TMT_TEST_RESTART_COUNT; exit 79"
+            restart-max-count: 3
+            restart-on-exit-code: [79]
+    /guest:
+        /reconnect:
+            summary: Test should fail due to reconnect timeout
+            test: '[ "$TMT_REBOOT_COUNT" == "0" ] && tmt-reboot -t 1 --hard; echo reboot_success'
