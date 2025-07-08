@@ -140,4 +140,27 @@
     /permission:
         test: /dev/null
     /invocation:
-        test: exit 122
+        /pidfile:
+            test: exit 122
+        /restart:
+            summary: Test should fail due to exceeded restart count
+            test: "echo RESTART_COUNT=$TMT_TEST_RESTART_COUNT; exit 79"
+            restart-max-count: 3
+            restart-on-exit-code: [79]
+    /guest:
+        /reconnect:
+            summary: Test should fail due to reconnect timeout
+            environment:
+                TMT_REBOOT_TIMEOUT: 1
+            test: |
+                # Test restart scenario where guest reboots during restart
+                if [ "$TMT_TEST_RESTART_COUNT" == "0" ]; then
+                    # First run - trigger reboot outside of tmt's control and request restart
+                    # This simulates a scenario where the guest reboots while tmt tries to restart the test
+                    (sleep 1; sudo reboot) &
+                    exit 42
+                fi
+                # Second run - should not reach here due to reconnect timeout
+                echo "Should not reach here"
+            restart-on-exit-code: [42]
+            restart-max-count: 1
