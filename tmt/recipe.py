@@ -41,8 +41,7 @@ def _serialize_tests(tests: list['Test']) -> list[dict[str, Any]]:
     for test in tests:
         serialized_test = test._export(include_internal=True)
         # Replace the modified environment with the original one
-        if test._original_environment is not None:
-            serialized_test['environment'] = test._original_environment.to_fmf_spec()
+        serialized_test['environment'] = test._original_fmf_environment.to_fmf_spec()
         serialized_tests.append(serialized_test)
     return serialized_tests
 

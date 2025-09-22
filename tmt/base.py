@@ -1248,7 +1248,10 @@ class Test(
 
     serial_number: int = field(default=0, internal=True)
 
-    _original_environment: Optional[tmt.utils.Environment] = None
+    _original_fmf_environment: tmt.utils.Environment = field(
+        internal=True,
+        default_factory=tmt.utils.Environment,
+    )
 
     _KEYS_SHOW_ORDER = [
         # Basic test information
@@ -1363,7 +1366,7 @@ class Test(
             )
 
         self._update_metadata()
-        self._original_environment = self.environment.copy()
+        self._original_fmf_environment = self.environment.copy()
 
     @staticmethod
     def overview(tree: 'Tree') -> None:
@@ -4368,7 +4371,7 @@ class Run(tmt.utils.HasRunWorkdir, tmt.utils.Common):
         self.unique_id = str(time.time()).split('.')[0]
 
         self.policies = policies or []
-        self.recipe_builder = RecipeBuilder(logger) if self.opt('recipe') else None
+        self.recipe_builder = RecipeBuilder(logger)
 
     @property
     def run_workdir(self) -> Path:
@@ -4467,8 +4470,7 @@ class Run(tmt.utils.HasRunWorkdir, tmt.utils.Common):
         )
         self.write(Path('run.yaml'), tmt.utils.dict_to_yaml(data.to_serialized()))
 
-        if self.recipe_builder is not None:
-            self.recipe_builder.set_run(data, self.fmf_context)
+        self.recipe_builder.set_run(data, self.fmf_context)
 
     def load_from_workdir(self) -> None:
         """
@@ -4598,10 +4600,9 @@ class Run(tmt.utils.HasRunWorkdir, tmt.utils.Common):
         """
         Check overall results, return appropriate exit code
         """
-        # Save recipe if requested
-        if self.recipe_builder is not None:
-            self.recipe_builder.set_plans(list(self.plans))
-            self.recipe_builder.save(self.run_workdir)
+        # Save recipe
+        self.recipe_builder.set_plans(list(self.plans))
+        self.recipe_builder.save(self.run_workdir)
 
         # We get interesting results only if execute or prepare step is enabled
         execute = self.plans[0].execute
