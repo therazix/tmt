@@ -519,9 +519,9 @@ class Environment(dict[str, EnvVarValue]):
         )
 
     @classmethod
-    def from_fmf_spec(cls, data: Optional[dict[str, Any]] = None) -> 'Environment':
+    def from_spec(cls, data: Optional[dict[str, Any]] = None) -> 'Environment':
         """
-        Create environment from an fmf specification
+        Create environment from a specification file or from a CLI option
         """
 
         if not data:
@@ -529,9 +529,11 @@ class Environment(dict[str, EnvVarValue]):
 
         return Environment({key: EnvVarValue(str(value)) for key, value in data.items()})
 
-    def to_fmf_spec(self) -> dict[str, str]:
+    def to_spec(self) -> dict[str, str]:
         """
-        Convert to an fmf specification
+        Convert to a form suitable for saving in a specification file.
+
+        Variable names stay as they are. Values are converted to plain strings.
         """
 
         return {key: str(value) for key, value in self.items()}
