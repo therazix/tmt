@@ -1,0 +1,39 @@
+provision:
+  - how: container
+    name: client1
+    role: client
+    image: fedora:36
+
+  - how: container
+    name: client2
+    role: client
+    image: fedora:36
+
+  - how: container
+    name: server1
+    role: server
+    image: fedora:36
+
+  - how: container
+    name: server2
+    role: server
+    image: fedora:36
+
+execute:
+  how: tmt
+
+prepare:
+  - how: shell
+    script: |
+        source "$TMT_TOPOLOGY_BASH"
+        echo "CLIENTS='${TMT_GUESTS[client1.hostname]} ${TMT_GUESTS[client2.hostname]}'" >> "$TMT_PLAN_ENVIRONMENT_FILE"
+        echo "SERVERS='${TMT_GUESTS[server1.hostname]} ${TMT_GUESTS[server2.hostname]}'" >> "$TMT_PLAN_ENVIRONMENT_FILE"
+
+discover:
+    how: shell
+    tests:
+      - name: check-env
+        test: |
+          echo "TMT_PLAN_ENVIRONMENT_FILE: $TMT_PLAN_ENVIRONMENT_FILE"
+          echo "CLIENTS: $CLIENTS"
+          echo "SERVERS: $SERVERS"
