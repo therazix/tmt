@@ -259,10 +259,12 @@ class Finish(tmt.steps.StepWithQueue[FinishStepData, PluginOutcome]):
             # To separate "finish" from "pull" queue visually
             self.info('')
 
-            # Pull artifacts created in the plan data directory
-            # if there was at least one plugin executed
+            # Pull shared artifacts and each guest's private files.
+            # The environment file and source script used to live in the data
+            # directory, so this pull brought them back too.
             if self.phases() and self._steppified_ready_guests:
                 self.plan.pull_data_directory(self)
+                self.plan.pull_guest_private_directory(self)
 
                 # To separate "finish" from "pull" queue visually
                 self.info('')

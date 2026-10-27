@@ -720,9 +720,7 @@ class Plan(
         tmt.steps.sync_with_guests(
             step,
             'push',
-            tmt.steps.PushTask(
-                guests, lambda guest: (guest.plan_workdir, Path('/')), step._logger
-            ),
+            tmt.steps.PushTask(guests, lambda guest: (guest.plan_workdir, None), step._logger),
             step._logger,
         )
 
@@ -732,9 +730,7 @@ class Plan(
         tmt.steps.sync_with_guests(
             step,
             'pull',
-            tmt.steps.PullTask(
-                guests, lambda guest: (guest.plan_workdir, Path('/')), step._logger
-            ),
+            tmt.steps.PullTask(guests, lambda guest: (guest.plan_workdir, None), step._logger),
             step._logger,
         )
 
@@ -746,9 +742,7 @@ class Plan(
         tmt.steps.sync_with_guests(
             step,
             'push',
-            tmt.steps.PushTask(
-                guests, lambda guest: (self.data_directory, Path('/')), step._logger
-            ),
+            tmt.steps.PushTask(guests, lambda guest: (self.data_directory, None), step._logger),
             step._logger,
         )
 
@@ -760,9 +754,7 @@ class Plan(
         tmt.steps.sync_with_guests(
             step,
             'pull',
-            tmt.steps.PullTask(
-                guests, lambda guest: (self.data_directory, Path('/')), step._logger
-            ),
+            tmt.steps.PullTask(guests, lambda guest: (self.data_directory, None), step._logger),
             step._logger,
         )
 
@@ -775,7 +767,7 @@ class Plan(
             step,
             'push',
             tmt.steps.PushTask(
-                guests, lambda guest: (guest.private_directory, Path('/')), step._logger
+                guests, lambda guest: (guest.private_directory, None), step._logger
             ),
             step._logger,
         )
@@ -789,7 +781,7 @@ class Plan(
             step,
             'pull',
             tmt.steps.PullTask(
-                guests, lambda guest: (guest.private_directory, Path('/')), step._logger
+                guests, lambda guest: (guest.private_directory, None), step._logger
             ),
             step._logger,
         )
